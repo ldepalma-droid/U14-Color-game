@@ -10,9 +10,10 @@ const easyButton = document.getElementById("easy");
 const expertButton = document.getElementById("expert");
 const modeButtons = [hardButton, easyButton, expertButton];
 
-let numberOfColors = 6;
-let colors = generateRandomColors(numberOfColors);
+let numberOfSquares = 6;
+let colors = generateRandomColors(numberOfSquares);
 let pickedColor = pickColor();
+console.log("Cantidad de colores:", colors.length);
 
 function pickColor() {
     const randomIndex = Math.floor(Math.random() * colors.length);
@@ -40,9 +41,15 @@ function changeColors(color) {
     }
 }
 
+function playSquareEffect(square, effectClass) {
+    square.classList.remove("square-selected", "square-correct");
+    void square.offsetWidth;
+    square.classList.add(effectClass);
+}
+
 function setUpSquares() {
     for (let i = 0; i < squares.length; i++) {
-        if (i < numberOfColors) {
+        if (i < numberOfSquares) {
             squares[i].style.display = "block";
             squares[i].style.backgroundColor = colors[i];
         } else {
@@ -52,20 +59,28 @@ function setUpSquares() {
         squares[i].addEventListener("click", function () {
             const clickedColor = this.style.backgroundColor;
             if (clickedColor === pickedColor) {
+                playSquareEffect(this, "square-correct");
                 message.textContent = "¡Correcto!";
                 changeColors(clickedColor);
                 heading.style.backgroundColor = clickedColor;
+                resetButton.textContent = "Play Again?";
             } else {
+                playSquareEffect(this, "square-selected");
                 this.style.backgroundColor = getComputedStyle(document.body).backgroundColor;
                 message.textContent = "Intentalo Nuevamente";
             }
+        });
+
+        squares[i].addEventListener("animationend", function () {
+            this.classList.remove("square-selected", "square-correct");
         });
     }
 }
 
 function resetGame() {
-    colors = generateRandomColors(numberOfColors);
+    colors = generateRandomColors(numberOfSquares);
     pickedColor = pickColor();
+    console.log("Cantidad de colores:", colors.length);
     colorDisplay.textContent = pickedColor;
     message.textContent = "";
     heading.style.backgroundColor = "";
@@ -75,15 +90,15 @@ function resetGame() {
 
 function setUpSquareColors() {
     for (let i = 0; i < squares.length; i++) {
-        squares[i].style.display = i < numberOfColors ? "block" : "none";
-        if (i < numberOfColors) {
+        squares[i].style.display = i < numberOfSquares ? "block" : "none";
+        if (i < numberOfSquares) {
             squares[i].style.backgroundColor = colors[i];
         }
     }
 }
 
 function setMode(number, selectedButton) {
-    numberOfColors = number;
+    numberOfSquares = number;
     for (let i = 0; i < modeButtons.length; i++) {
         modeButtons[i].classList.toggle("selected", modeButtons[i] === selectedButton);
     }
